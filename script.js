@@ -1,64 +1,65 @@
 let btnOperator = document.querySelectorAll(".calculator-grid button");
-arrayNumbers = [];
-arrayOperator = [];
-storedLineArray = []
-
+let arrayNumbers = [];
+let arrayOperator = [];
+let storedLineArray = [];
 
 btnOperator.forEach((element, index) => {
     element.addEventListener("click", function() {
-        if (isNaN(element.textContent) === false || element.textContent == ".") {
+        console.log(arrayNumbers);
+        if (!isNaN(element.textContent) || element.textContent === ".") {
             storedLineArray.push(element.textContent);
+            document.getElementById("inputtext").innerHTML = "";
             repeatPrinting(storedLineArray);
-        } else if (element.textContent == "C") {
+        } else if (element.textContent === "C") {
             document.getElementById("inputtext").innerHTML = "";
             storedLineArray = [];
-        } else if (element.textContent == "DEL") {
+            arrayNumbers = [];
+            arrayOperator = [];
+        } else if (element.textContent === "DEL") {
             storedLineArray.pop();
             repeatPrinting(storedLineArray);
-        } else if (element.textContent == "+" || element.textContent == "*" || element.textContent == "/" || element.textContent == "-") {
+        } else if (["+", "*", "/", "-"].includes(element.textContent)) {
             storeNumber(storedLineArray);
+            if (arrayNumbers.length === 1) {
+                arrayOperator.push(element.textContent);
+            } else {
+                results();
+                arrayOperator.push(element.textContent);
+            }
             storedLineArray = [];
-            arrayOperator.push(element.textContent);
-        } else if (element.textContent == "=") {
-            storeNumber(storedLineArray);
-            storedLineArray = [];
-            results();
-
+        } else if (element.textContent === "=") {
+            if (storedLineArray.length > 0) {
+                storeNumber(storedLineArray);
+                storedLineArray = [];
+                results();
+            }
         }
-    })
+    });
 });
 
 function repeatPrinting(array) {
-    document.getElementById("inputtext").innerHTML = "";
-    storedLineArray.forEach(number => {
-        document.getElementById("inputtext").innerHTML += number;
-    });
+    document.getElementById("inputtext").innerHTML = array.join("");
 }
 
 function storeNumber(array) {
-    let numberTemp = 0;
-    array.forEach(element => {
-        numberTemp += element.toString();
-    });
+    let numberTemp = array.join("");
     arrayNumbers.push(Number(numberTemp));
-    document.getElementById("inputtext").innerHTML = "";
 }
 
 function results() {
     let result = arrayNumbers[0];
-    arrayOperator.forEach((element, index) => {
-        if (element === "+") {
-            result = result + arrayNumbers[index + 1];
-        } else if (element === "*") {
-            result = result * arrayNumbers[index + 1];
-        } else if (element === "/") {
-            result = result / arrayNumbers[index + 1];
-        } else if (element === "-") {
-            result = result - arrayNumbers[index + 1];
+    arrayOperator.forEach((operator, index) => {
+        if (operator === "+") {
+            result += arrayNumbers[index + 1];
+        } else if (operator === "-") {
+            result -= arrayNumbers[index + 1];
+        } else if (operator === "*") {
+            result *= arrayNumbers[index + 1];
+        } else if (operator === "/") {
+            result /= arrayNumbers[index + 1];
         }
-        document.getElementById("inputtext").innerHTML = result;
-
     });
-    arrayNumbers = [];
+    arrayNumbers = [result];
     arrayOperator = [];
+    document.getElementById("inputtext").innerHTML = result;
 }
